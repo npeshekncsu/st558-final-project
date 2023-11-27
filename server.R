@@ -51,7 +51,7 @@ shinyServer(function(input, output, session) {
     })
     
     output$titlePanel <- renderUI({
-        text <- paste0("Investigation of ", str_to_title(input$vore), "vore Mammal Sleep Data") 
+        text <- paste0("Investigation of ", input$vore, "vore Mammal Sleep Data") 
         titlePanel(h1(text))
     })
     
