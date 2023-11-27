@@ -1,58 +1,53 @@
 library(shiny)
-library(dplyr)
+library(caret)
+library(tidyverse)
+library(DT)
 library(ggplot2)
+data("GermanCredit")
 
-shinyServer(function(input, output, session) {
+shinyServer(function(input, output) {
     
-    getData <- reactive({
-        newData <- msleep %>% filter(vore == input$vore)
-    })
-    
-    #create plot
-    output$sleepPlot <- renderPlot({
-        #get filtered data
-        newData <- getData()
-        
-        #create plot
-        g <- ggplot(newData, aes(x = bodywt, y = sleep_total))
-        
-        observe({updateSliderInput(session, "size", value = input$size)})
-        
-        if(input$conservation & input$change_symbol_checkbox){
+    output$summary_plot <- renderPlot({
+        if (input$radio_choice == 'Just Classification') {
             
-            observe({updateSliderInput(session, "size",  min = 3)})
-
-            g <- ggplot(newData, aes(x = bodywt, y = sleep_total, alpha=newData$sleep_rem))
-            g + geom_point(size = input$size, aes(col = conservation)) + labs(alpha = "sleep_rem")
+            ggplot(GermanCredit, aes(x = Class)) +
+                geom_bar() +
+                labs(x = "Class",
+                     y = "count")
             
-        } else if(input$conservation) {
+        } else if (input$radio_choice == 'Classification and Unemployed') {
             
-            observe({updateSliderInput(session, "size",  min = 1)})
+            ggplot(GermanCredit, aes(x = Class, fill = as.factor(EmploymentDuration.Unemployed))) +
+                geom_bar(position = "dodge", stat = "count") +
+                labs(x = "Class",
+                     y = "count") +
+                labs(fill = "Unemployment status") +
+                scale_fill_manual(
+                    values = c("0" = "#F8766D", "1" = "#00BFC4"),
+                    labels = c("0" = "Employed", "1" = "Unemployed")
+                )
             
-            g + geom_point(size = input$size, aes(col = conservation))
             
         } else {
-            g + geom_point(size = input$size)
+            ggplot(GermanCredit, aes(x = Class, fill = as.factor(ForeignWorker))) +
+                geom_bar(position = "dodge", stat = "count") +
+                labs(x = "Class",
+                     y = "count") +
+                labs(fill = "Status") +
+                scale_fill_manual(
+                    values = c("0" = "#F8766D", "1" = "#00BFC4"),
+                    labels = c("0" = "German", "1" = "Foreign")
+                )
+            
         }
-        
     })
     
-    #create text info
-    output$info <- renderText({
-        #get filtered data
-        newData <- getData()
-        
-        paste("The average body weight for order", input$vore, "is", round(mean(newData$bodywt, na.rm = TRUE), 2), "and the average total sleep time is", round(mean(newData$sleep_total, na.rm = TRUE), 2), sep = " ")
+    output$summary_table <- renderDataTable({
+        round = as.numeric(input$numeric_value)
+        var = input$variables_to_summarize
+        GermanCredit %>%
+            select("Class", "InstallmentRatePercentage", var) %>%
+            group_by(Class, InstallmentRatePercentage) %>%
+            summarize(mean = round(mean(get(var)), round))
     })
-    
-    #create output of observations    
-    output$table <- renderTable({
-        getData()
-    })
-    
-    output$titlePanel <- renderUI({
-        text <- paste0("Investigation of ", input$vore, "vore Mammal Sleep Data") 
-        titlePanel(h1(text))
-    })
-    
 })

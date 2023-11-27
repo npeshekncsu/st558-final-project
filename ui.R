@@ -1,31 +1,34 @@
-library(ggplot2)
+library(shiny)
+library(caret)
+library(shiny)
+library(DT)
+
+data("GermanCredit")
 
 shinyUI(fluidPage(
+    titlePanel("Summaries for German Credit Data"),
     
-    # Application title
-    uiOutput("titlePanel"),
-    
-    # Sidebar with options for the data set
     sidebarLayout(
         sidebarPanel(
-            h3("Select the mammal's biological order:"),
-            selectizeInput("vore", "Vore", selected = "omni", choices = levels(as.factor(msleep$vore))),
+            h4("This data set comes from the", 
+               HTML("<a href='https://topepo.github.io/caret'>caret package</a>  - originally from the UCI machine learning repository")),
             br(),
-            sliderInput("size", "Size of Points on Graph",
-                        min = 1, max = 10, value = 5, step = 1),
-            checkboxInput("conservation", h4("Color Code Conservation Status", style = "color:red;")),
-            conditionalPanel(
-                condition = "input.conservation==true",
-                checkboxInput("change_symbol_checkbox", h5("Also change symbol based on REM sleep?"))
-            ),
+            h6("You can create a few bar plots using the radio buttons below."),
+            radioButtons("radio_choice", "Select the Plot Type",
+                         choices = c("Just Classification", 
+                                     "Classification and Unemployed", 
+                                     "Classification and Foreign"),
+                         selected = "Just Classification"),
+            br(),
+            h5("You can find the ", HTML("<b>sample mean</b>"),  " for a few variables below: "),
+            selectInput("variables_to_summarize", "Variables to Summarize",
+                        choices = c("Age", "Duration", "Amount"),
+                        selected = "Age"),
+            numericInput("numeric_value", "Select the number of digits for rounding", value = 2, min = 0, step = 1)
+            
         ),
-        
-        
-        # Show outputs
         mainPanel(
-            plotOutput("sleepPlot"),
-            textOutput("info"),
-            tableOutput("table")
-        )
-    )
+            plotOutput("summary_plot"),
+            DTOutput("summary_table")
+        ) )
 ))
