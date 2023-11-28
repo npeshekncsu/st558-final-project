@@ -1,0 +1,100 @@
+---
+title: "debug_app"
+author: "Nataliya Peshekhodko"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r setup, include=FALSE}
+data = read_csv('./data/water_potability.csv')
+```
+
+```{r}
+nrow(data)
+sapply(data, function(x) sum(is.na(x)))
+```
+
+```{r}
+data = na.omit(data)
+nrow(data)
+#drop_na(data)
+```
+
+
+```{r}
+data %>%
+  filter(Potability == 0) %>%
+  nrow
+
+data %>%
+  filter(Potability == 1) %>%
+  nrow
+```
+
+
+```{r}
+data <- data %>%
+  mutate(Sulfate_quartiles = case_when(
+    Sulfate <= quantile(data$Sulfate)[[1]] ~ "Q1",
+    Sulfate > quantile(data$Sulfate)[[1]] & Sulfate <= quantile(data$Sulfate)[[2]] ~ "Q2",
+    Sulfate > quantile(data$Sulfate)[[2]] & Sulfate <= quantile(data$Sulfate)[[3]] ~ "Q3",
+    Sulfate > quantile(data$Sulfate)[[3]] ~ "Q4"
+  )) %>% mutate(Sulfate_quartiles = as.factor(Sulfate_quartiles))
+```
+
+
+```{r}
+table(data$Potability)
+```
+
+
+```{r}
+ggplot(data, aes(x = Sulfate_quartiles, fill = as.factor(Potability), group = Potability)) +
+  geom_bar(position = "stack") +
+  labs(
+    title = "Number of Cases with Diabetes and Without Diabetes by Income",
+    x = "Income",
+    y = "Number of Cases"
+  ) +
+  scale_fill_manual(
+    values = c("0" = "grey", "1" = "red"),
+    labels = c("0" = "Not potable", "1" = "Potable")
+  ) +
+  labs(fill = "Water Potability")
+```
+
+
+```{r}
+ggplot(data, aes(x=Sulfate, fill=as.factor(Potability)))+
+    geom_density(alpha=.5) +
+  scale_fill_manual(
+    values = c("0" = "grey", "1" = "red"),
+    labels = c("0" = "Not potable", "1" = "Potable")
+  ) +
+  labs(fill = "Water Potability")
+```
+
+```{r}
+ggplot(data, aes(x=Hardness, fill=as.factor(Potability)))+
+    geom_density(alpha=.5) +
+  scale_fill_manual(
+    values = c("0" = "grey", "1" = "red"),
+    labels = c("0" = "Not potable", "1" = "Potable")
+  ) +
+  labs(fill = "Water Potability")
+```
+
+```{r}
+ggplot(data, aes(x=Chloramines, fill=as.factor(Potability)))+
+    geom_density(alpha=.5) +
+  scale_fill_manual(
+    values = c("0" = "grey", "1" = "red"),
+    labels = c("0" = "Not potable", "1" = "Potable")
+  ) +
+  labs(fill = "Water Potability")
+```
