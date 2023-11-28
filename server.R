@@ -5,7 +5,22 @@ library(DT)
 library(ggplot2)
 #data("GermanCredit")
 
+
+data = read_csv('./data/water_potability.csv')
+data = na.omit(data)
+
 shinyServer(function(input, output) {
+    
+    output$summary_plot <- renderPlot({
+        ggplot(data, aes(x=Sulfate, fill=as.factor(Potability)))+
+            geom_density(alpha=.5) +
+            scale_fill_manual(
+                values = c("0" = "grey", "1" = "red"),
+                labels = c("0" = "Not potable", "1" = "Potable")
+            ) +
+            labs(fill = "Water Potability")
+    })
+    
     
     # output$summary_plot <- renderPlot({
     #     if (input$radio_choice == 'Just Classification') {

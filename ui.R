@@ -43,7 +43,26 @@ shinyUI(
                
                
                
-               tabPanel('Data Exploration'),
+               tabPanel('Data Exploration', 
+                        h2("Exploratory Data Analysis"),
+                        
+                        br(),
+                        
+                        
+                        sidebarLayout(
+                            sidebarPanel(
+                                h6("You can create a few bar plots using the radio buttons below."),
+                                selectInput("variables_to_summarize", "Variables to Summarize",
+                                            choices = c("ph", "Hardness", "Solids", "Chloramines"),
+                                            selected = "Chloramines" ) ), 
+                                            #numericInput("numeric_value", 
+                                            #             "Select the number of digits for rounding", 
+                                            #             value = 2, min = 0, step = 1)),
+                            mainPanel(
+                                plotOutput("summary_plot")
+                            )
+                            )
+                        ),
                tabPanel('Modeling'),
                tabPanel('Prediction'))
     
