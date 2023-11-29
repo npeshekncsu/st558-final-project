@@ -60,7 +60,7 @@ shinyUI(
                                             selected = "Chloramines" ),
                                 
                                 selectInput("graph_type", "Select graph type",
-                                        choices = c("Violin", "Density"),
+                                        choices = c("Violin", "Density", "Boxplot"),
                                         selected = "Density" ),
                                 br(),
                                 br(),
@@ -86,8 +86,20 @@ shinyUI(
                                             #             "Select the number of digits for rounding", 
                                             #             value = 2, min = 0, step = 1)),
                             mainPanel(
+                                h4("Distribution plot", align = 'center'),
                                 plotOutput("summary_plot"),
+                                br(),
+                                h4("Scatter plot", align = 'center'),
                                 plotOutput("scatter_plot"),
+                                br(),
+                                h4("Correlation matrix", align = 'center'),
+                                radioButtons("corr_plot_type", "Select the Plot Type",
+                                                                   choices = c("Number", 
+                                                                               "Color", 
+                                                                               "Elipse"),
+                                                                   selected = "Color"),
+                                plotOutput("corr_plot"),
+                                br(),
                                 plotOutput("quantile_plot")
                             )
                             )

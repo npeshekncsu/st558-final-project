@@ -119,3 +119,13 @@ ggplot(data, aes(x = as.factor(Potability),
  labs(fill = "Diabetes Status")
 ```
 
+
+```{r}
+str(data)
+```
+
+```{r}
+corrplot(cor(as.matrix(data)), 
+                 type="upper", 
+                 tl.pos = "lt")
+```

@@ -3,6 +3,7 @@ library(caret)
 library(tidyverse)
 library(DT)
 library(ggplot2)
+library(corrplot)
 #data("GermanCredit")
 
 
@@ -20,284 +21,46 @@ data <- data %>%
 
 shinyServer(function(input, output) {
     
-    
     output$summary_plot <- renderPlot({
-        
-        if (input$variables_to_summarize == 'Sulfate') {
-            
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Sulfate, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-            else if(input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Sulfate, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of sulfate by potability status",
-                        x = "potability",
-                        y = "Sulfate"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
+        if(input$graph_type == 'Density') {
+            ggplot(data, aes(x=get(input$variables_to_summarize), fill=as.factor(Potability)))+
+                                 geom_density(alpha=.5) +
+                                 scale_fill_manual(
+                                     values = c("0" = "grey", "1" = "red"),
+                                     labels = c("0" = "Not potable", "1" = "Potable")
+                                 ) +
+                                 labs(fill = "Water Potability")
             
         }
-        else if  (input$variables_to_summarize == 'Hardness') {
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Hardness, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-                
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Hardness, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of hardness by potability status",
-                        x = "potability",
-                        y = "Hardness"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-            
-        
-            
+        else if(input$graph_type == 'Violin') {
+            ggplot(data, aes(x = as.factor(Potability), 
+                             y = get(input$variables_to_summarize), 
+                             group = Potability, 
+                             fill = as.factor(Potability)) ) +
+                labs(#title = "Violin plot of sulfate by potability status",
+                     x = "potability",
+                     y = "Sulfate") + 
+                geom_violin(trim = FALSE, alpha=.5) + scale_fill_manual(
+                    values = c("0" = "grey", "1" = "red"),
+                    labels = c("0" = "Not potable", "1" = "Potable")) +
+                labs(fill = "Water Potability")
         }
-        
-        else if  (input$variables_to_summarize == 'Solids') {
-            
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Solids, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Solids, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of solids by potability status",
-                        x = "potability",
-                        y = "Solids"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-            
-            
-        }
-        
-        else if  (input$variables_to_summarize == 'Chloramines') {
-            
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Chloramines, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Chloramines, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of chloramines by potability status",
-                        x = "potability",
-                        y = "Chloramines"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-        }
-        
-        else if  (input$variables_to_summarize == 'Conductivity') {
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Conductivity, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Conductivity, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of conductivity by potability status",
-                        x = "potability",
-                        y = "Conductivity"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-          
-        }
-        
-        else if  (input$variables_to_summarize == 'Organic_carbon') {
-            
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Organic_carbon, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Organic_carbon, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of organic carbon by potability status",
-                        x = "potability",
-                        y = "Conductivity"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-            
-        }
-        
-        else if  (input$variables_to_summarize == 'Trihalomethanes') {
-            
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Trihalomethanes, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Trihalomethanes, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of trihalomethanes by potability status",
-                        x = "potability",
-                        y = "Conductivity"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-            
-            
-        }
-        
-        else if  (input$variables_to_summarize == 'Turbidity') {
-            
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=Turbidity, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = Turbidity, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of turbidity by potability status",
-                        x = "potability",
-                        y = "Conductivity"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-        }
-        
-        else if  (input$variables_to_summarize == 'ph') {
-            
-            if(input$graph_type == 'Density') {
-                ggplot(data, aes(x=ph, fill=as.factor(Potability)))+
-                    geom_density(alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            else if (input$graph_type == 'Violin') {
-                ggplot(data, aes(x = as.factor(Potability), 
-                                 y = ph, group = Potability, fill = as.factor(Potability))) +
-                    labs(
-                        title = "Violin plot of ph by potability status",
-                        x = "potability",
-                        y = "Conductivity"
-                    ) +
-                    geom_violin(trim = FALSE, alpha=.5) +
-                    scale_fill_manual(
-                        values = c("0" = "grey", "1" = "red"),
-                        labels = c("0" = "Not potable", "1" = "Potable")
-                    ) +
-                    labs(fill = "Water Potability")
-            }
-            
-            
-            
+        else if(input$graph_type == 'Boxplot') {
+            ggplot(data, aes(x = Potability, 
+                             y = get(input$variables_to_summarize), fill = as.factor(Potability))) + 
+                geom_boxplot(alpha=.5) + scale_fill_manual(
+                    values = c("0" = "grey", "1" = "red"),
+                    labels = c("0" = "Not potable", "1" = "Potable")) +
+                labs(fill = "Water Potability")
         }
     })
     
     output$scatter_plot <- renderPlot ({
-        ggplot(data, aes(x=get(input$x_var), y=get(input$y_var), color=as.factor(Potability))) + geom_point()
+        ggplot(data, aes(x=get(input$x_var), y=get(input$y_var), color=as.factor(Potability))) + 
+            geom_point() + scale_fill_manual(
+                values = c("0" = "grey", "1" = "red"),
+                labels = c("0" = "Not potable", "1" = "Potable")) +
+            labs(fill = "Water Potability")
     })
     
     output$quantile_plot <- renderPlot({
@@ -313,6 +76,40 @@ shinyServer(function(input, output) {
                 labels = c("0" = "Not potable", "1" = "Potable")
             ) +
             labs(fill = "Water Potability")
+    })
+    
+    output$corr_plot <- renderPlot({
+        
+        if (input$corr_plot_type == 'Color') {
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles))), 
+                     #corrplot(cor(as.matrix(data)), 
+                     type="upper", 
+                     #method = 'number',
+                     method = 'color', order = 'alphabet',
+                     #method = 'ellipse', order = 'AOE', type = 'upper',
+                     tl.pos = "lt")
+        }
+        else if (input$corr_plot_type == 'Number') {
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles))), 
+                     #corrplot(cor(as.matrix(data)), 
+                     type="upper", 
+                     method = 'number',
+                     #method = 'color', order = 'alphabet',
+                     #method = 'ellipse', order = 'AOE', type = 'upper',
+                     tl.pos = "lt")
+        }
+        
+        else if (input$corr_plot_type == 'Elipse') {
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles))), 
+                     #corrplot(cor(as.matrix(data)), 
+                     #type="upper", 
+                     #method = 'number',
+                     #method = 'color', order = 'alphabet',
+                     method = 'ellipse', order = 'AOE', type = 'upper',
+                     tl.pos = "lt")
+        }
+        
+        
     })
     
         
