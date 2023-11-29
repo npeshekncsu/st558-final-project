@@ -51,15 +51,44 @@ shinyUI(
                         
                         sidebarLayout(
                             sidebarPanel(
-                                h6("You can create a few bar plots using the radio buttons below."),
-                                selectInput("variables_to_summarize", "Variables to Summarize",
-                                            choices = c("ph", "Hardness", "Solids", "Chloramines"),
-                                            selected = "Chloramines" ) ), 
+                                #h3("Exploratory plots"),
+                                h3("Density plots"),
+                                selectInput("variables_to_summarize", "Density plots for variable",
+                                            choices = c("ph", "Hardness", "Solids", 
+                                                        "Chloramines", "Sulfate", "Conductivity", 
+                                                        "Organic_carbon", "Trihalomethanes", "Turbidity"),
+                                            selected = "Chloramines" ),
+                                
+                                selectInput("graph_type", "Select graph type",
+                                        choices = c("Violin", "Density"),
+                                        selected = "Density" ),
+                                br(),
+                                br(),
+                                
+                                h3("Scatter plots"),
+                                selectInput("x_var", "x",
+                                            choices = c("ph", "Hardness", "Solids", 
+                                                        "Chloramines", "Sulfate", "Conductivity", 
+                                                        "Organic_carbon", "Trihalomethanes", "Turbidity"),
+                                            selected = "Hardness" ),
+                                
+                                selectInput("y_var", "y",
+                                            choices = c("ph", "Hardness", "Solids", 
+                                                        "Chloramines", "Sulfate", "Conductivity", 
+                                                        "Organic_carbon", "Trihalomethanes", "Turbidity"),
+                                            selected = "Solids" ),
+                                
+                                ),
+                            
+                                
+                                
                                             #numericInput("numeric_value", 
                                             #             "Select the number of digits for rounding", 
                                             #             value = 2, min = 0, step = 1)),
                             mainPanel(
-                                plotOutput("summary_plot")
+                                plotOutput("summary_plot"),
+                                plotOutput("scatter_plot"),
+                                plotOutput("quantile_plot")
                             )
                             )
                         ),

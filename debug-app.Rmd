@@ -58,7 +58,7 @@ ggplot(data, aes(x = Sulfate_quartiles, fill = as.factor(Potability), group = Po
   geom_bar(position = "stack") +
   labs(
     title = "Number of Cases with Diabetes and Without Diabetes by Income",
-    x = "Income",
+    x = "Sulfate quantiles",
     y = "Number of Cases"
   ) +
   scale_fill_manual(
@@ -98,3 +98,24 @@ ggplot(data, aes(x=Chloramines, fill=as.factor(Potability)))+
   ) +
   labs(fill = "Water Potability")
 ```
+
+
+
+
+
+```{r}
+ggplot(data, aes(x = as.factor(Potability), 
+                 y = Hardness, group = Potability, fill = as.factor(Potability))) +
+ labs(
+   title = "Violin Plot of Diabetes Status by BMI",
+   x = "Diabetes Status",
+   y = "BMI Scale"
+ ) +
+ geom_violin(trim = FALSE) +
+ scale_fill_manual(
+   values = c("0" = "grey", "1" = "red"),
+   labels = c("0" = "Without Diabetes", "1" = "With Diabetes")
+   ) +
+ labs(fill = "Diabetes Status")
+```
+
