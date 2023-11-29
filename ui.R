@@ -52,8 +52,9 @@ shinyUI(
                         sidebarLayout(
                             sidebarPanel(
                                 #h3("Exploratory plots"),
-                                h3("Density plots"),
-                                selectInput("variables_to_summarize", "Density plots for variable",
+                                h3("Distribution plots"),
+                                br(),
+                                selectInput("variables_to_summarize", "Select variable",
                                             choices = c("ph", "Hardness", "Solids", 
                                                         "Chloramines", "Sulfate", "Conductivity", 
                                                         "Organic_carbon", "Trihalomethanes", "Turbidity"),
@@ -62,6 +63,13 @@ shinyUI(
                                 selectInput("graph_type", "Select graph type",
                                         choices = c("Violin", "Density", "Boxplot"),
                                         selected = "Density" ),
+                                br(),
+                                br(),
+                                br(),
+                                br(),
+                                br(),
+                                br(),
+                                br(),
                                 br(),
                                 br(),
                                 
@@ -100,6 +108,11 @@ shinyUI(
                                                                    selected = "Color"),
                                 plotOutput("corr_plot"),
                                 br(),
+                                h4("Histograms", align = 'center'),
+                                selectInput("histogram_var", "Select variable",
+                                            choices = c("Solids", 
+                                                        "Sulfate", "Chloramines"),
+                                            selected = "Solids"),
                                 plotOutput("quantile_plot")
                             )
                             )

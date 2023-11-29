@@ -19,6 +19,24 @@ data <- data %>%
     )) %>% mutate(Sulfate_quartiles = as.factor(Sulfate_quartiles))
 
 
+data <- data %>%
+    mutate(Chloramines_quartiles = case_when(
+        Chloramines <= quantile(data$Chloramines)[[1]] ~ "Q1",
+        Chloramines > quantile(data$Chloramines)[[1]] & Chloramines <= quantile(data$Chloramines)[[2]] ~ "Q2",
+        Chloramines > quantile(data$Chloramines)[[2]] & Chloramines <= quantile(data$Chloramines)[[3]] ~ "Q3",
+        Chloramines > quantile(data$Chloramines)[[3]] ~ "Q4"
+    )) %>% mutate(Chloramines_quartiles = as.factor(Chloramines_quartiles))
+
+
+data <- data %>%
+    mutate(Solids_quartiles = case_when(
+        Solids <= quantile(data$Solids)[[1]] ~ "Q1",
+        Solids > quantile(data$Solids)[[1]] & Solids <= quantile(data$Solids)[[2]] ~ "Q2",
+        Solids > quantile(data$Solids)[[2]] & Solids <= quantile(data$Solids)[[3]] ~ "Q3",
+        Solids > quantile(data$Solids)[[3]] ~ "Q4"
+    )) %>% mutate(Solids_quartiles = as.factor(Solids_quartiles))
+
+
 shinyServer(function(input, output) {
     
     output$summary_plot <- renderPlot({
@@ -64,24 +82,57 @@ shinyServer(function(input, output) {
     })
     
     output$quantile_plot <- renderPlot({
-        ggplot(data, aes(x = Sulfate_quartiles, fill = as.factor(Potability), group = Potability)) +
-            geom_bar(position = "stack", alpha=.5) +
-            labs(
-                title = "Number of cases of potable and not potable water for each sulfate quantile",
-                x = "Sulfate quantiles",
-                y = "Number of Cases"
-            ) +
-            scale_fill_manual(
-                values = c("0" = "grey", "1" = "red"),
-                labels = c("0" = "Not potable", "1" = "Potable")
-            ) +
-            labs(fill = "Water Potability")
+        
+        if (input$histogram_var == 'Sulfate') {
+            ggplot(data, aes(x = Sulfate_quartiles, fill = as.factor(Potability), group = Potability)) +
+                geom_bar(position = "stack", alpha=.5) +
+                labs(
+                    title = "Number of cases of potable and not potable water for each sulfate quantile",
+                    x = "Sulfate quantiles",
+                    y = "Number of Cases"
+                ) +
+                scale_fill_manual(
+                    values = c("0" = "grey", "1" = "red"),
+                    labels = c("0" = "Not potable", "1" = "Potable")
+                ) +
+                labs(fill = "Water Potability")
+        }
+        else if (input$histogram_var == 'Solids') {
+            ggplot(data, aes(x = Solids_quartiles, fill = as.factor(Potability), group = Potability)) +
+                geom_bar(position = "stack", alpha=.5) +
+                labs(
+                    title = "Number of cases of potable and not potable water for each sulfate quantile",
+                    x = "Solids quantiles",
+                    y = "Number of Cases"
+                ) +
+                scale_fill_manual(
+                    values = c("0" = "grey", "1" = "red"),
+                    labels = c("0" = "Not potable", "1" = "Potable")
+                ) +
+                labs(fill = "Water Potability")
+        }
+        else if (input$histogram_var == 'Chloramines') {
+            ggplot(data, aes(x = Chloramines_quartiles, fill = as.factor(Potability), group = Potability)) +
+                geom_bar(position = "stack", alpha=.5) +
+                labs(
+                    title = "Number of cases of potable and not potable water for each sulfate quantile",
+                    x = "Chloramines quantiles",
+                    y = "Number of Cases"
+                ) +
+                scale_fill_manual(
+                    values = c("0" = "grey", "1" = "red"),
+                    labels = c("0" = "Not potable", "1" = "Potable")
+                ) +
+                labs(fill = "Water Potability")
+        }
+        
+        
     })
     
     output$corr_plot <- renderPlot({
         
         if (input$corr_plot_type == 'Color') {
-            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles))), 
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, -Chloramines_quartiles))), 
                      #corrplot(cor(as.matrix(data)), 
                      type="upper", 
                      #method = 'number',
@@ -90,7 +141,7 @@ shinyServer(function(input, output) {
                      tl.pos = "lt")
         }
         else if (input$corr_plot_type == 'Number') {
-            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles))), 
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, -Chloramines_quartiles))), 
                      #corrplot(cor(as.matrix(data)), 
                      type="upper", 
                      method = 'number',
@@ -100,7 +151,7 @@ shinyServer(function(input, output) {
         }
         
         else if (input$corr_plot_type == 'Elipse') {
-            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles))), 
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, -Chloramines_quartiles))), 
                      #corrplot(cor(as.matrix(data)), 
                      #type="upper", 
                      #method = 'number',
