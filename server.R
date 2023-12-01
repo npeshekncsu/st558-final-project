@@ -4,6 +4,7 @@ library(tidyverse)
 library(DT)
 library(ggplot2)
 library(corrplot)
+library(caret)
 #data("GermanCredit")
 
 
@@ -35,6 +36,22 @@ data <- data %>%
         Solids > quantile(data$Solids)[[2]] & Solids <= quantile(data$Solids)[[3]] ~ "Q3",
         Solids > quantile(data$Solids)[[3]] ~ "Q4"
     )) %>% mutate(Solids_quartiles = as.factor(Solids_quartiles))
+
+
+split_data <- function(partition, data) {
+    
+    results <- list()
+    trainIndex <- createDataPartition(data$Potability, p = partition, 
+                                      list = FALSE, 
+                                      times = 1)
+    train_data = data[trainIndex, ]
+    val_data = data[-trainIndex, ]
+    
+    results = append(results, train_data)
+    results = append(results, val_data)
+    
+    return (results)
+}
 
 
 shinyServer(function(input, output) {
@@ -159,6 +176,58 @@ shinyServer(function(input, output) {
                      method = 'ellipse', order = 'AOE', type = 'upper',
                      tl.pos = "lt")
         }
+        
+        
+        #eventReactive(input$train, {
+        observeEvent(input$train, {
+            showNotification("This is a notification.")
+            #split_results = split_data(partition = 0.8, data)
+            
+            trainIndex <- createDataPartition(data$Potability, p = 0.8, 
+                                              list = FALSE, 
+                                              times = 1)
+            train_data = data[trainIndex, ]
+            val_data = data[-trainIndex, ]
+            
+            train_data$Potability = as.factor(train_data$Potability)
+            val_data$Potability = as.factor(val_data$Potability)
+            
+            
+            glm_predictors = input$glm_predictor_selector
+            glm_model = train(reformulate(glm_predictors, "Potability"), 
+                               data = train_data,
+                               method = "glm", 
+                               family="binomial"
+                               #metric="logLoss",
+                               #trControl = train.control
+            )
+            
+            rf_predictors = input$rf_predictor_selector
+            
+            
+            observe({print((input$rf_predictor_selector)) })
+            
+            #print(input$rf_predictor_selector)
+            #print(head(train_data))
+            
+            print(glm_predictors)
+            print(summary(glm_model))
+            print('here')
+            print(glm_model$results$Accuracy)
+            
+            #glm_summary <- renderText({
+            #    #summary(glm_model$results$Accuracy)
+            #    'my text'
+            #})
+            #output$glm_summary <- renderText({paste("You have selected", "input$var")})
+            #output$glm_summary <- renderText({glm_model$results$Accuracy})
+            output$glm_summary <- renderText({paste('Accuaracy for GLM model:', glm_model$results$Accuracy)})
+            
+            
+        })
+        
+       
+        
         
         
     })

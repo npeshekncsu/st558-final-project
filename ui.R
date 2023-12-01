@@ -8,7 +8,9 @@ library(DT)
 
 #tabPanel(“Tab-1”, fluidRow(h1(“Welcome to the home page of SimpleApp”)
 
-
+predictors  <- c("ph", "Hardness", "Solids", "Chloramines", "Sulfate",
+                 "Conductivity", "Organic_carbon", "Trihalomethanes", 
+                 "Turbidity")
 shinyUI(
     
     navbarPage(title='Final Project App',
@@ -117,8 +119,52 @@ shinyUI(
                             )
                             )
                         ),
-               tabPanel('Modeling'),
-               tabPanel('Prediction'))
+               tabPanel('Modeling', 
+                        tabsetPanel(
+                            tabPanel("Model Info",
+                                     h3('Text')), 
+                            tabPanel("Model Fitting",
+                                     br(),
+                                     sliderInput("data_split", "Data split",
+                                                 min = 10, max = 100, value = 70, step = 1),
+                                     checkboxGroupInput(
+                                         "glm_predictor_selector",
+                                         h4("Select Generalized linear regression model predictors"),
+                                         choices = predictors,
+                                         inline = TRUE,
+                                         selected = predictors,
+                                         #width = '350px'
+                                     ),
+                                     br(),
+                                     checkboxGroupInput(
+                                         "rf_predictor_selector",
+                                         h4("Select Random Forest model predictors"),
+                                         choices = predictors,
+                                         inline = TRUE,
+                                         selected = predictors,
+                                         #width = '350px'
+                                     ),
+                                     actionButton('train', 'Train models', class = "btn-primary btn-lg"),
+                                  
+                            
+                                     conditionalPanel(
+                                       #condition = "input.train==true",
+                                       condition = "input.train",    
+                                       textOutput('glm_summary'),
+                                       
+                                       checkboxInput("change_symbol_checkbox", h5("Also change symbol based on REM sleep?")),
+                                       #textOutput('glm_summary')
+                                     )
+                            ),
+                                
+                            
+                             
+                            
+                            
+                            tabPanel("Prediction"))
+                        
+                        
+                        ))
     
     
     #fluidPage(
