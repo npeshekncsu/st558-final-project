@@ -146,22 +146,31 @@ shinyUI(
                                      ),
                                      actionButton('train', 'Train models', class = "btn-primary btn-lg"),
                                   
-                            
-                                     conditionalPanel(
-                                       #condition = "input.train==true",
-                                       condition = "input.train",    
-                                       textOutput('glm_summary'),
+                                     textOutput('glm_summary'),
+                                     textOutput('rf_summary')
+                                     #checkboxInput("change_symbol_checkbox", h5("test"))
+                                     #conditionalPanel(
+                                     #  #condition = "input.train==true",
+                                     #  condition = "input.train != 0",    
+                                     #  textOutput('glm_summary'),
+                                     #  textOutput('rf_summary')
                                        
-                                       checkboxInput("change_symbol_checkbox", h5("Also change symbol based on REM sleep?")),
-                                       #textOutput('glm_summary')
-                                     )
+                                     #  checkboxInput("change_symbol_checkbox", h5("Also change symbol based on REM sleep?"))
+                                     #  #textOutput('glm_summary')
+                                     #)
                             ),
                                 
                             
                              
                             
                             
-                            tabPanel("Prediction"))
+                            tabPanel("Prediction",
+                                     h3("GLM predict"),
+                                     br(),
+                                     uiOutput("glm_predictors"),
+                                     h3('RF predict'),
+                                     ),
+                           )
                         
                         
                         ))

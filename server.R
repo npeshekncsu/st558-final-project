@@ -178,53 +178,117 @@ shinyServer(function(input, output) {
         }
         
         
-        #eventReactive(input$train, {
         observeEvent(input$train, {
             showNotification("This is a notification.")
-            #split_results = split_data(partition = 0.8, data)
             
-            trainIndex <- createDataPartition(data$Potability, p = 0.8, 
-                                              list = FALSE, 
+            trainIndex <- createDataPartition(data$Potability, p = 0.1,
+                                              list = FALSE,
                                               times = 1)
             train_data = data[trainIndex, ]
             val_data = data[-trainIndex, ]
-            
+
             train_data$Potability = as.factor(train_data$Potability)
             val_data$Potability = as.factor(val_data$Potability)
-            
-            
+
+
             glm_predictors = input$glm_predictor_selector
-            glm_model = train(reformulate(glm_predictors, "Potability"), 
+
+            #train.control = trainControl(method = "cv", number = 5)
+            glm_model = train(reformulate(glm_predictors, "Potability"),
                                data = train_data,
-                               method = "glm", 
-                               family="binomial"
+                               method = "glm",
+                               family="binomial")
                                #metric="logLoss",
-                               #trControl = train.control
-            )
-            
+                               #trControl = train.control)
+
             rf_predictors = input$rf_predictor_selector
-            
-            
-            observe({print((input$rf_predictor_selector)) })
-            
+            #train_control <- trainControl(
+            #    method = "cv",
+            #    number = 5
+            #)
+
+            rf_model = train(
+                reformulate(rf_predictors, "Potability"),
+                data = train_data,
+                method = "rf",
+                #tuneGrid = data.frame(mtry = c(1:4)),
+                #trControl = train_control
+            )
+
+
+            #observe({print((input$rf_predictor_selector)) })
+
             #print(input$rf_predictor_selector)
             #print(head(train_data))
-            
+
             print(glm_predictors)
             print(summary(glm_model))
+            print(summary(rf_model) )
             print('here')
             print(glm_model$results$Accuracy)
             
+            glm_accuracy = glm_model$results$Accuracy
+            rf_accuracy = max(rf_model$results$Accuracy)
+            
+            rf_best_result = rf_model$bestTune$mtry
+             
             #glm_summary <- renderText({
             #    #summary(glm_model$results$Accuracy)
             #    'my text'
             #})
             #output$glm_summary <- renderText({paste("You have selected", "input$var")})
             #output$glm_summary <- renderText({glm_model$results$Accuracy})
-            output$glm_summary <- renderText({paste('Accuaracy for GLM model:', glm_model$results$Accuracy)})
+            #output$glm_summary <- renderText({paste('Accuaracy for GLM model:', glm_model$results$Accuracy)})
+            output$glm_summary <- renderText({paste('Accuaracy for GLM model:', glm_accuracy)})
+            output$rf_summary <- renderText({paste('Accuaracy for RF model:', rf_accuracy)})
             
             
+            #output$rf_summary <- renderText({paste('Accuaracy for random forest model:', rf_model$results$Accuracy)})
+            
+            
+            observe({(input$rf_predictor_selector)})
+            observe({(input$glm_predictor_selector)})
         })
+        
+        
+        output$glm_predictors <- renderUI({
+            
+            #observe({(input$glm_predictor_selector)})
+            
+            
+            
+          
+        
+            #glm_predictors_vec <- observe({(input$glm_predictor_selector)})
+            glm_predictors_vec <- input$glm_predictor_selector
+            
+            
+            #glm_predictors_vec = c("ph", "solid", "sulfate")
+            n <- length(glm_predictors_vec)
+            selectInputs <- lapply(1:n, function(i) {
+                textInput(paste0("input", glm_predictors_vec[i]), label = glm_predictors_vec[i]) 
+            }) 
+            do.call(tagList, selectInputs)
+            
+            
+            #for(i in 1:length(glm_predictors_vec)){
+            #    label = paste0(glm_predictors_vec[i], "input")
+            #    print(label)
+            #    textInput(label, glm_predictors_vec[i])
+            #}
+            
+            #for(i in 1:length(glm_predictors_vec)){
+            #    label = paste0(glm_predictors_vec[i], "input")
+            #    textInput(label, glm_predictors_vec[i])
+            #}
+            
+            #tagList(
+            #    sliderInput("n", "N", 1, 1000, 500),
+            #    textInput("label", "Label")
+            #)
+        })
+        
+        
         
        
         
