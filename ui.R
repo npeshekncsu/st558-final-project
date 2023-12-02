@@ -169,6 +169,8 @@ shinyUI(
                                      br(),
                                      uiOutput("glm_predictors"),
                                      h3('RF predict'),
+                                     uiOutput("rf_predictors"),
+                                     actionButton('predict', 'Predict', class = "btn-primary btn-lg"),
                                      ),
                            )
                         
