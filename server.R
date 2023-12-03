@@ -201,7 +201,9 @@ shinyServer(function(input, output) {
         val_data$Potability = as.factor(val_data$Potability)
 
         glm_predictors = input$glm_predictor_selector
-        train.control = trainControl(method = "cv", number = 3)
+        #train.control = trainControl(method = "cv", number = 3)
+        
+        train.control = trainControl(method = "cv", number = input$folds_glm)
         glm_model = train(reformulate(glm_predictors, "Potability"),
                           data = train_data,
                           method = "glm",
@@ -214,14 +216,20 @@ shinyServer(function(input, output) {
         rf_predictors = input$rf_predictor_selector
         train_control <- trainControl(
             method = "cv",
-            number = 3
+            number = input$folds_rf,
+            #number = 3,
+            search = "grid"
         )
         rf_model = train(reformulate(rf_predictors, "Potability"),
                          data = train_data,
                          method = "rf",
-                         tuneGrid = data.frame(mtry = c(1:5)),
+                         #tuneGrid = data.frame(mtry = c(1:5)),
+                         #tuneGrid = expand.grid(mtry=c(1:5)),
+                         tuneGrid = expand.grid(mtry=c(input$minMtry:input$maxMtry)),
+                         #tuneGrid = data.frame(mtry = c(input$minMtry:input$maxMtry)),
                          metric="Accuracy",
-                         trControl = train_control
+                         trControl = train_control,
+                         importance = TRUE
                          )
         saveRDS(rf_model, "rf_model.RDS")
 
