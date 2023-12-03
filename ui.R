@@ -177,7 +177,12 @@ shinyUI(
                                                       verbatimTextOutput("cnf_matrix_glm"),
                                                       br(),
                                                       h4("Random Forest confusion matrix"),
-                                                      verbatimTextOutput("cnf_matrix_rf")),
+                                                      verbatimTextOutput("cnf_matrix_rf"),
+                                                      br(),
+                                                      plotOutput('rf_model_plot'),
+                                                      br(),
+                                                      dataTableOutput('var_imprt_rf'))
+                                                      #verbatimTextOutput('var_imprt_rf')),
                                                       
                                      #h3('Performance of the fitted models'),
                                   
@@ -214,6 +219,11 @@ shinyUI(
                                      h3('RF predict'),
                                      uiOutput("rf_predictors"),
                                      actionButton('predict', 'Predict', class = "btn-primary btn-lg"),
+                                     br(),
+                                     br(),
+                                     textOutput('pred_glm'),
+                                     br(),
+                                     textOutput('pred_rf')
                                      ),
                            )
                         

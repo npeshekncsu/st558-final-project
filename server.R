@@ -203,7 +203,7 @@ shinyServer(function(input, output) {
         glm_predictors = input$glm_predictor_selector
         #train.control = trainControl(method = "cv", number = 3)
         
-        train.control = trainControl(method = "cv", number = input$folds_glm)
+        train.control = trainControl(method = "cv", number = as.numeric(input$folds_glm) )
         glm_model = train(reformulate(glm_predictors, "Potability"),
                           data = train_data,
                           method = "glm",
@@ -216,7 +216,7 @@ shinyServer(function(input, output) {
         rf_predictors = input$rf_predictor_selector
         train_control <- trainControl(
             method = "cv",
-            number = input$folds_rf,
+            number = as.numeric(input$folds_rf),
             #number = 3,
             search = "grid"
         )
@@ -225,7 +225,7 @@ shinyServer(function(input, output) {
                          method = "rf",
                          #tuneGrid = data.frame(mtry = c(1:5)),
                          #tuneGrid = expand.grid(mtry=c(1:5)),
-                         tuneGrid = expand.grid(mtry=c(input$minMtry:input$maxMtry)),
+                         tuneGrid = expand.grid(mtry=c(as.numeric(input$minMtry):as.numeric(input$maxMtry)) ),
                          #tuneGrid = data.frame(mtry = c(input$minMtry:input$maxMtry)),
                          metric="Accuracy",
                          trControl = train_control,
@@ -282,6 +282,13 @@ shinyServer(function(input, output) {
                                                accuracy(val_data$Potability, test_predictions_rf))})
             
         #output$rf_summary <- renderText({paste('Accuaracy for random forest model:', rf_model$results$Accuracy)})
+        
+        output$rf_model_plot <- renderPlot({
+            plot(rf_model)
+        })
+        
+        #output$var_imprt_rf <- renderText({paste('test', varImp(rf_model) )})
+        output$var_imprt_rf <- renderDataTable(varImp(rf_model)[[1]])
             
         observe({(input$rf_predictor_selector)})
         observe({(input$glm_predictor_selector)})
@@ -328,7 +335,7 @@ shinyServer(function(input, output) {
             
             print(new_data_glm)
             
-            res_glm = predict(glm_model_from_file, newdata = new_data_glm, type = "prob")
+            res_glm = predict(glm_model_from_file, newdata = new_data_glm)#, type = "prob")
             print(res_glm)
             
             
@@ -345,8 +352,13 @@ shinyServer(function(input, output) {
             
             print(new_data_rf)
             
-            res_rf = predict(rf_model_from_file, newdata = new_data_rf, type = "prob")
+            res_rf = predict(rf_model_from_file, newdata = new_data_rf)# , type = "prob")
             print(res_rf)
+            
+            output$pred_glm <- renderText({paste('Prediction from GLM model:', 
+                                                 res_glm)})
+            output$pred_rf <- renderText({paste('Prediction from Random Forest model:', 
+                                                 res_rf)})
     })
 })
     
