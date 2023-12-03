@@ -11,6 +11,9 @@ library(DT)
 predictors  <- c("ph", "Hardness", "Solids", "Chloramines", "Sulfate",
                  "Conductivity", "Organic_carbon", "Trihalomethanes", 
                  "Turbidity")
+
+
+
 shinyUI(
     
     navbarPage(title='Final Project App',
@@ -169,6 +172,11 @@ shinyUI(
                                                       textOutput('glm_summary'),
                                                       textOutput('rf_summary'),
                                                       br(),
+                                                      h5('Random Forest model plot'),
+                                                      plotOutput('rf_model_plot'),
+                                                      br(),
+                                                      h5('Random Forest variable importance'),
+                                                      dataTableOutput('var_imprt_rf'),
                                                       h4('On validation dataset'),
                                                       textOutput('glm_accuracy_val_glm'),
                                                       textOutput('glm_accuracy_val_rf'),
@@ -178,10 +186,8 @@ shinyUI(
                                                       br(),
                                                       h4("Random Forest confusion matrix"),
                                                       verbatimTextOutput("cnf_matrix_rf"),
-                                                      br(),
-                                                      plotOutput('rf_model_plot'),
-                                                      br(),
-                                                      dataTableOutput('var_imprt_rf'))
+                                                      #br()
+                                                      )
                                                       #verbatimTextOutput('var_imprt_rf')),
                                                       
                                      #h3('Performance of the fitted models'),

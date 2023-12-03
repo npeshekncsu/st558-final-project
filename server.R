@@ -54,6 +54,14 @@ split_data <- function(partition, data) {
     return (results)
 }
 
+if_water_potable <- function(binary_value) {
+    if (binary_value == 0) {
+        return ('Not potable water')
+    }
+    else {
+        return ('Potable water')
+    }
+}
 
 current_glm_model = NULL
 current_rf_model = NULL
@@ -356,9 +364,9 @@ shinyServer(function(input, output) {
             print(res_rf)
             
             output$pred_glm <- renderText({paste('Prediction from GLM model:', 
-                                                 res_glm)})
+                                                 if_water_potable(res_glm) )})
             output$pred_rf <- renderText({paste('Prediction from Random Forest model:', 
-                                                 res_rf)})
+                                                if_water_potable (res_rf))})
     })
 })
     
