@@ -279,34 +279,45 @@ shinyServer(function(input, output) {
     observeEvent(input$predict, {
             showNotification("This is a notification.")
             glm_model_from_file <- readRDS("glm_model.RDS")
-            res = predict(glm_model_from_file, newdata = head(data), type = "prob")
-            print(res)
+            #res = predict(glm_model_from_file, newdata = head(data), type = "prob")
+            #print(res)
             
             rf_model_from_file <- readRDS("rf_model.RDS")
-            res = predict(rf_model_from_file, newdata = head(data), type = "prob")
-            print(res)
+            #res = predict(rf_model_from_file, newdata = head(data), type = "prob")
+            #print(res)
             
             glm_predictors_vec <- input$glm_predictor_selector
             
-            new_data = as.data.frame(matrix(numeric(),nrow = 0, ncol = length(glm_predictors_vec)))
-            colnames(new_data) = glm_predictors_vec
+            #new_data = as.data.frame(matrix(numeric(),nrow = 0, ncol = length(glm_predictors_vec)))
+            #colnames(new_data) = glm_predictors_vec
+            new_data = data.frame()
+            
             print(new_data)
-            values = list()
-            for (i in length(glm_predictors_vec)) {
+            print(length(glm_predictors_vec))
+            values = c()
+            for (i in 1:length(glm_predictors_vec)) {
                 input_id = paste0('glm_', glm_predictors_vec[i])
                 #print(glm_predictors_vec[i])
-                #print(input_id)
-                append(values, input[[input_id]])
+                print(input_id)
+                print('here')
+                print(input[[input_id]])
+                values <- append(values, input[[input_id]])
                 #new_data[glm_predictors_vec[i]] = input$input_id
             }
+            #df[1,] <- values
             
             print(values)
             #input_id = get('input$glm_Sulfate')
            
             #print(values)
             #print(new_data)
-            new_data = rbind(new_data, values)
+            new_data = rbind(new_data, as.numeric(values) )
+            colnames(new_data) = glm_predictors_vec
+            
             print(new_data)
+            
+            res = predict(glm_model_from_file, newdata = new_data, type = "prob")
+            print(res)
             
         
     })
