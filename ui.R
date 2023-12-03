@@ -3,7 +3,7 @@ library(caret)
 library(shiny)
 library(DT)
 
-#data("GermanCredit")
+
 
 
 #tabPanel(“Tab-1”, fluidRow(h1(“Welcome to the home page of SimpleApp”)
@@ -129,25 +129,65 @@ shinyUI(
                                                  min = 10, max = 100, value = 70, step = 1),
                                      checkboxGroupInput(
                                          "glm_predictor_selector",
-                                         h4("Select Generalized linear regression model predictors"),
+                                         h4("Generalized linear regression model settings"),
                                          choices = predictors,
                                          inline = TRUE,
                                          selected = predictors,
                                          #width = '350px'
                                      ),
                                      br(),
+                                     h4('Cross validation'),
+                                     textInput('folds_glm', 'Number of folds', value = '5'),
+                                     br(),
+                                     br(),
                                      checkboxGroupInput(
                                          "rf_predictor_selector",
-                                         h4("Select Random Forest model predictors"),
+                                         h4("Random Forest model settings"),
                                          choices = predictors,
                                          inline = TRUE,
                                          selected = predictors,
                                          #width = '350px'
                                      ),
+                                     br(),
+                                     h4('Tuning grid for number of variables to randomly sample as candidates at each split'),
+                                     textInput('minMtry', 'Min value for MTRY hyperparameter', value = '1'),
+                                     textInput('maxMtry', 'Max value for MTRY hyperparameter', value = '5'),
+                                     br(),
+                                     h4('Cross validation'),
+                                     textInput('folds_rf', 'Number of folds', value = '5'),
                                      actionButton('train', 'Train models', class = "btn-primary btn-lg"),
+                                     br(),
+                                     br(),
+                                     
+                                     conditionalPanel(condition = "input.train",
+                                                      h3('Performance of the fitted models'),
+                                                      br(),
+                                                      h4('On training dataset'),
+                                                      textOutput('glm_summary'),
+                                                      textOutput('rf_summary'),
+                                                      br(),
+                                                      h4('On validation dataset'),
+                                                      textOutput('glm_accuracy_val_glm'),
+                                                      textOutput('glm_accuracy_val_rf'),
+                                                      br(),
+                                                      h4("GLM confusion matrix"),
+                                                      verbatimTextOutput("cnf_matrix_glm"),
+                                                      br(),
+                                                      h4("Random Forest confusion matrix"),
+                                                      verbatimTextOutput("cnf_matrix_rf")),
+                                                      
+                                     #h3('Performance of the fitted models'),
                                   
-                                     textOutput('glm_summary'),
-                                     textOutput('rf_summary')
+                                     #textOutput('glm_summary'),
+                                     #textOutput('rf_summary'),
+                                     #br(),
+                                     #h4('On validation dataset'),
+                                     #textOutput('glm_accuracy_val_glm'),
+                                     #textOutput('glm_accuracy_val_rf'),
+                                     
+                                     #verbatimTextOutput("cnf_matrix_glm"),
+                                     #verbatimTextOutput("cnf_matrix_rf")
+                                     
                                      #checkboxInput("change_symbol_checkbox", h5("test"))
                                      #conditionalPanel(
                                      #  #condition = "input.train==true",

@@ -5,6 +5,7 @@ library(DT)
 library(ggplot2)
 library(corrplot)
 library(caret)
+library(Metrics)
 #data("GermanCredit")
 
 
@@ -185,10 +186,12 @@ shinyServer(function(input, output) {
         
     observeEvent(input$train, {
     #eventReactive(input$train, {
-        print("Test")
-        showNotification("This is a notification.")
+    
+        showNotification("Training started")
+        
+        print(input$data_split)
             
-        trainIndex <- createDataPartition(data$Potability, p = 0.1,
+        trainIndex <- createDataPartition(data$Potability, p = input$data_split/100,
                                           list = FALSE,
                                           times = 1)
         train_data = data[trainIndex, ]
@@ -197,37 +200,30 @@ shinyServer(function(input, output) {
         train_data$Potability = as.factor(train_data$Potability)
         val_data$Potability = as.factor(val_data$Potability)
 
-
         glm_predictors = input$glm_predictor_selector
-
-        #train.control = trainControl(method = "cv", number = 5)
+        train.control = trainControl(method = "cv", number = 3)
         glm_model = train(reformulate(glm_predictors, "Potability"),
                           data = train_data,
                           method = "glm",
-                          family="binomial")
-                               #metric="logLoss",
-                               #trControl = train.control)
+                          family="binomial", #)
+                          metric="Accuracy",
+                          trControl = train.control)
         saveRDS(glm_model, "glm_model.RDS")
 
+        
         rf_predictors = input$rf_predictor_selector
-        #train_control <- trainControl(
-        #    method = "cv",
-        #    number = 5
-        #)
-
+        train_control <- trainControl(
+            method = "cv",
+            number = 3
+        )
         rf_model = train(reformulate(rf_predictors, "Potability"),
                          data = train_data,
-                         method = "rf"
-                         #tuneGrid = data.frame(mtry = c(1:4)),
-                         #trControl = train_control
+                         method = "rf",
+                         tuneGrid = data.frame(mtry = c(1:5)),
+                         metric="Accuracy",
+                         trControl = train_control
                          )
         saveRDS(rf_model, "rf_model.RDS")
-
-
-        #observe({print((input$rf_predictor_selector)) })
-
-        #print(input$rf_predictor_selector)
-        #print(head(train_data))
 
         
         print(summary(glm_model))
@@ -246,8 +242,36 @@ shinyServer(function(input, output) {
         #output$glm_summary <- renderText({paste("You have selected", "input$var")})
         #output$glm_summary <- renderText({glm_model$results$Accuracy})
         #output$glm_summary <- renderText({paste('Accuaracy for GLM model:', glm_model$results$Accuracy)})
-        output$glm_summary <- renderText({paste('Accuaracy for GLM model:', glm_accuracy)})
-        output$rf_summary <- renderText({paste('Accuaracy for RF model:', rf_accuracy)})
+        output$glm_summary <- renderText({paste('Accuaracy for GLM model on training dataset:', glm_accuracy)})
+        output$rf_summary <- renderText({paste('Accuaracy for RF model on training dataset:', rf_accuracy)})
+        
+        
+        test_predictions_glm <- predict(glm_model,  val_data %>% select(-Potability))
+        
+        test_predictions_rf <- predict(rf_model, val_data %>% select(-Potability))
+        
+        print(table(test_predictions_glm, val_data$Potability))
+        
+        print(table(test_predictions_rf, val_data$Potability))
+        
+        output$cnf_matrix_glm <- renderPrint({
+            table(test_predictions_glm, val_data$Potability)
+        })
+        
+        output$cnf_matrix_rf <- renderPrint({
+            table(test_predictions_rf, val_data$Potability)
+        })
+        
+        
+        
+        print(accuracy(val_data$Potability, test_predictions_rf))
+        print(accuracy(val_data$Potability, test_predictions_glm))
+        
+        
+        output$glm_accuracy_val_glm <- renderText({paste('Accuaracy for GLM model on validation dataset:', 
+                                                accuracy(val_data$Potability, test_predictions_glm))})
+        output$glm_accuracy_val_rf <- renderText({paste('Accuaracy for RF model on validation dataset:', 
+                                               accuracy(val_data$Potability, test_predictions_rf))})
             
         #output$rf_summary <- renderText({paste('Accuaracy for random forest model:', rf_model$results$Accuracy)})
             
@@ -277,49 +301,44 @@ shinyServer(function(input, output) {
         
         
     observeEvent(input$predict, {
-            showNotification("This is a notification.")
+            showNotification("Prediction started.")
             glm_model_from_file <- readRDS("glm_model.RDS")
-            #res = predict(glm_model_from_file, newdata = head(data), type = "prob")
-            #print(res)
-            
             rf_model_from_file <- readRDS("rf_model.RDS")
-            #res = predict(rf_model_from_file, newdata = head(data), type = "prob")
-            #print(res)
             
             glm_predictors_vec <- input$glm_predictor_selector
+            rf_predictors_vec <- input$rf_predictor_selector
             
-            #new_data = as.data.frame(matrix(numeric(),nrow = 0, ncol = length(glm_predictors_vec)))
-            #colnames(new_data) = glm_predictors_vec
-            new_data = data.frame()
-            
-            print(new_data)
-            print(length(glm_predictors_vec))
+            new_data_glm = data.frame()
             values = c()
             for (i in 1:length(glm_predictors_vec)) {
                 input_id = paste0('glm_', glm_predictors_vec[i])
-                #print(glm_predictors_vec[i])
-                print(input_id)
-                print('here')
-                print(input[[input_id]])
                 values <- append(values, input[[input_id]])
-                #new_data[glm_predictors_vec[i]] = input$input_id
             }
-            #df[1,] <- values
             
-            print(values)
-            #input_id = get('input$glm_Sulfate')
-           
-            #print(values)
-            #print(new_data)
-            new_data = rbind(new_data, as.numeric(values) )
-            colnames(new_data) = glm_predictors_vec
+            new_data_glm = rbind(new_data_glm, as.numeric(values) )
+            colnames(new_data_glm) = glm_predictors_vec
             
-            print(new_data)
+            print(new_data_glm)
             
-            res = predict(glm_model_from_file, newdata = new_data, type = "prob")
-            print(res)
+            res_glm = predict(glm_model_from_file, newdata = new_data_glm, type = "prob")
+            print(res_glm)
             
-        
+            
+            
+            new_data_rf = data.frame()
+            values = c()
+            for (i in 1:length(rf_predictors_vec)) {
+                input_id = paste0('rf_', rf_predictors_vec[i])
+                values <- append(values, input[[input_id]])
+            }
+            
+            new_data_rf = rbind(new_data_rf, as.numeric(values) )
+            colnames(new_data_rf) = rf_predictors_vec
+            
+            print(new_data_rf)
+            
+            res_rf = predict(rf_model_from_file, newdata = new_data_rf, type = "prob")
+            print(res_rf)
     })
 })
     
