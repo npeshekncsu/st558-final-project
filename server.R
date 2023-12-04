@@ -61,21 +61,45 @@ shinyServer(function(input, output) {
                                      values = c("0" = "grey", "1" = "red"),
                                      labels = c("0" = "Not potable", "1" = "Potable")
                                  ) +
-                                 labs(fill = "Water Potability")
+                                 labs(fill = "Water Potability") + theme_bw()
             
         }
         else if(input$graph_type == 'Violin') {
+            # ggplot(data, aes(x = as.factor(Potability), 
+            #                  y = get(input$variables_to_summarize), 
+            #                  group = Potability, 
+            #                  fill = as.factor(Potability)) ) +
+            #     labs(#title = "Violin plot of sulfate by potability status",
+            #          x = "potability",
+            #          y = "Sulfate") + 
+            #     geom_violin(trim = FALSE, alpha=.5) + scale_fill_manual(
+            #         values = c("0" = "grey", "1" = "red"),
+            #         labels = c("0" = "Not potable", "1" = "Potable")) +
+            #     labs(fill = "Water Potability") + theme_bw()
+            
+            
+            
             ggplot(data, aes(x = as.factor(Potability), 
                              y = get(input$variables_to_summarize), 
                              group = Potability, 
                              fill = as.factor(Potability)) ) +
-                labs(#title = "Violin plot of sulfate by potability status",
-                     x = "potability",
-                     y = "Sulfate") + 
-                geom_violin(trim = FALSE, alpha=.5) + scale_fill_manual(
+                labs(
+                    # title = "Violin plot of sulfate by potability status",
+                    title = "Violin plot",
+                    x = '', 
+                    y = '',
+                    fill = "Water Potability"
+                ) + 
+                geom_violin(trim = FALSE, alpha = 0.5) + 
+                scale_fill_manual(
                     values = c("0" = "grey", "1" = "red"),
-                    labels = c("0" = "Not potable", "1" = "Potable")) +
-                labs(fill = "Water Potability")
+                    labels = c("0" = "Not potable", "1" = "Potable")
+                ) +
+                #labs(fill = "Water Potability") + 
+                theme_bw()
+            
+            
+            
         }
         else if(input$graph_type == 'Boxplot') {
             ggplot(data, aes(x = Potability, 
@@ -83,16 +107,25 @@ shinyServer(function(input, output) {
                 geom_boxplot(alpha=.5) + scale_fill_manual(
                     values = c("0" = "grey", "1" = "red"),
                     labels = c("0" = "Not potable", "1" = "Potable")) +
-                labs(fill = "Water Potability")
+                labs(fill = "Water Potability") + theme_bw()
         }
     })
     
     output$scatter_plot <- renderPlot ({
+        #ggplot(data, aes(x=get(input$x_var), y=get(input$y_var), color=as.factor(Potability))) + 
+        #    geom_point() + scale_fill_manual(
+        #        values = c("0" = "grey", "1" = "red"),
+        #        labels = c("0" = "Not potable", "1" = "Potable")) +
+        #    labs(fill = "Water Potability")
+        
+        
         ggplot(data, aes(x=get(input$x_var), y=get(input$y_var), color=as.factor(Potability))) + 
-            geom_point() + scale_fill_manual(
+            geom_point() + scale_color_manual(
                 values = c("0" = "grey", "1" = "red"),
-                labels = c("0" = "Not potable", "1" = "Potable")) +
-            labs(fill = "Water Potability")
+                labels = c("0" = "Not potable", "1" = "Potable"),
+                name = "Water Potability") +
+            theme_bw()
+            #labs(fill = "Water Potability")
     })
     
     output$quantile_plot <- renderPlot({
@@ -109,7 +142,7 @@ shinyServer(function(input, output) {
                     values = c("0" = "grey", "1" = "red"),
                     labels = c("0" = "Not potable", "1" = "Potable")
                 ) +
-                labs(fill = "Water Potability")
+                labs(fill = "Water Potability") + theme_bw()
         }
         else if (input$histogram_var == 'Solids') {
             ggplot(data, aes(x = Solids_quartiles, fill = as.factor(Potability), group = Potability)) +
@@ -123,7 +156,7 @@ shinyServer(function(input, output) {
                     values = c("0" = "grey", "1" = "red"),
                     labels = c("0" = "Not potable", "1" = "Potable")
                 ) +
-                labs(fill = "Water Potability")
+                labs(fill = "Water Potability") + theme_bw()
         }
         else if (input$histogram_var == 'Chloramines') {
             ggplot(data, aes(x = Chloramines_quartiles, fill = as.factor(Potability), group = Potability)) +
@@ -137,7 +170,7 @@ shinyServer(function(input, output) {
                     values = c("0" = "grey", "1" = "red"),
                     labels = c("0" = "Not potable", "1" = "Potable")
                 ) +
-                labs(fill = "Water Potability")
+                labs(fill = "Water Potability") + theme_bw()
         }
         
         
