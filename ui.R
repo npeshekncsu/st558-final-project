@@ -34,9 +34,9 @@ shinyUI(
                                   
                                    
                                    h3("Purpose of the application"),
-                                   p('This application allows to predict water potability based on water quality metrics.'),
+                                   p('This application allows for the prediction of water potability based on water quality metrics.'),
                                    h3("Data"),
-                                   p("Dataset to train models is taken from ",  a(href="https://www.kaggle.com/datasets/devanshibavaria/water-potability-dataset-with-10-parameteres",
+                                   p("The dataset used to train models is taken from ",  a(href="https://www.kaggle.com/datasets/devanshibavaria/water-potability-dataset-with-10-parameteres",
                                                                 "Kaggle"), '.'),
                                    h4("Features in dataset"),
                                    h5('pH value'),
@@ -61,12 +61,16 @@ shinyUI(
                                    p('Indicates if water is safe for human consumption where 1 means Potable and 0 means Not potable.'),
                                    h3("Application structure"),
                                    h5('About tab'),
-                                   p('Provides description of the application purpose and dataset used to build models.'),
+                                   p("Provides a description of the application's purpose and the dataset used to build models."),
                                    h5('Data exploration tab'),
-                                   p('The purpose of this tab is to conduct exploratory data analyses on the water potability dataset.'),
+                                   p('The purpose of this tab is to conduct exploratory data analysis on the water potability dataset.'),
                                    h5('Modeling/Model Info tab'),
-                                   p('This page contains description of the models which this app allows to build.'),
-                                   h5('Modeling/Model fitting')
+                                   p('This page contains a description of the models that this app allows users to build.'),
+                                   h5('Modeling/Model fitting'),
+                                   p('This page allows you to select predictors for each model and fit both types of models. After training is done, summary statistics from the training and validation datasets will be provided.'),
+                                   h5('Modeling/Prediction'),
+                                   p('Once the models are trained, users can use this page to predict water potability with the models on new data.'),
+                                   br()
                                    
                             ),
                             #box(title='SimpleApp left box', width= 6,
