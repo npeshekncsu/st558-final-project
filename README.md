@@ -1,4 +1,4 @@
-*Authors: Jacob Press, Nataliya Peshekhodko*
+*Author: Nataliya Peshekhodko*
 
 # Goal
 
