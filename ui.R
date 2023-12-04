@@ -4,35 +4,16 @@ library(shiny)
 library(DT)
 
 
-
-
-#tabPanel(“Tab-1”, fluidRow(h1(“Welcome to the home page of SimpleApp”)
-
 predictors  <- c("ph", "Hardness", "Solids", "Chloramines", "Sulfate",
                  "Conductivity", "Organic_carbon", "Trihalomethanes", 
                  "Turbidity")
 
-
-
 shinyUI(
-    
     navbarPage(title='Final Project App',
-               
-               
-               tabPanel('About', #, 
-                        #br(),
-                        #div(),
-                        #img(src='final_project_logo.jpg', 
-                        #    align = "center", 
-                        #    width="20%", 
-                        #    height ="85px"),
+               tabPanel('About',
                         fluidRow(
-                            column(8, offset = 0.5, align = "left",  # Adjust the column width and alignment as needed
-                                   # Additional content on the right (e.g., image and text)
+                            column(8, offset = 0.5, align = "left",
                                    img(src = "final_project_logo.jpg", width = "20%"),
-                                   #h2("About this project"),
-                                  
-                                   
                                    h3("Purpose of the application"),
                                    p('This application allows for the prediction of water potability based on water quality metrics.'),
                                    h3("Data"),
@@ -73,22 +54,14 @@ shinyUI(
                                    br()
                                    
                             ),
-                            #box(title='SimpleApp left box', width= 6,
-                            
                         ) ),
-                        #fluidRow(h4('ST 558 final project application', align = 'center')) ),
-               
-               
                
                tabPanel('Data Exploration', 
                         h2("Exploratory Data Analysis"),
                         
                         br(),
-                        
-                        
                         sidebarLayout(
                             sidebarPanel(
-                                #h3("Exploratory plots"),
                                 h3("Distribution plots"),
                                 br(),
                                 selectInput("variables_to_summarize", "Select variable",
@@ -124,12 +97,6 @@ shinyUI(
                                             selected = "Solids" ),
                                 
                                 ),
-                            
-                                
-                                
-                                            #numericInput("numeric_value", 
-                                            #             "Select the number of digits for rounding", 
-                                            #             value = 2, min = 0, step = 1)),
                             mainPanel(
                                 h4("Distribution plot", align = 'center'),
                                 plotOutput("summary_plot"),
@@ -187,11 +154,10 @@ shinyUI(
                                      h2("Model settings"),
                                      checkboxGroupInput(
                                          "glm_predictor_selector",
-                                         h4("Generalized linear regression model predictors"),
+                                         h4("Logistic regression model predictors"),
                                          choices = predictors,
                                          inline = TRUE,
                                          selected = predictors,
-                                         #width = '350px'
                                      ),
                                      br(),
                                      h4('Cross validation'),
@@ -222,7 +188,9 @@ shinyUI(
                                                       br(),
                                                       h4('On training dataset'),
                                                       textOutput('glm_summary'),
+                                                      br(),
                                                       textOutput('rf_summary'),
+                                                      textOutput('rf_best_result_mtry'),
                                                       br(),
                                                       h5('Random Forest model plot'),
                                                       plotOutput('rf_model_plot'),
@@ -233,48 +201,18 @@ shinyUI(
                                                       textOutput('glm_accuracy_val_glm'),
                                                       textOutput('glm_accuracy_val_rf'),
                                                       br(),
-                                                      h4("GLM confusion matrix"),
+                                                      h4("Logistic regression confusion matrix"),
                                                       verbatimTextOutput("cnf_matrix_glm"),
                                                       br(),
                                                       h4("Random Forest confusion matrix"),
                                                       verbatimTextOutput("cnf_matrix_rf"),
-                                                      #br()
                                                       )
-                                                      #verbatimTextOutput('var_imprt_rf')),
-                                                      
-                                     #h3('Performance of the fitted models'),
-                                  
-                                     #textOutput('glm_summary'),
-                                     #textOutput('rf_summary'),
-                                     #br(),
-                                     #h4('On validation dataset'),
-                                     #textOutput('glm_accuracy_val_glm'),
-                                     #textOutput('glm_accuracy_val_rf'),
-                                     
-                                     #verbatimTextOutput("cnf_matrix_glm"),
-                                     #verbatimTextOutput("cnf_matrix_rf")
-                                     
-                                     #checkboxInput("change_symbol_checkbox", h5("test"))
-                                     #conditionalPanel(
-                                     #  #condition = "input.train==true",
-                                     #  condition = "input.train != 0",    
-                                     #  textOutput('glm_summary'),
-                                     #  textOutput('rf_summary')
-                                       
-                                     #  checkboxInput("change_symbol_checkbox", h5("Also change symbol based on REM sleep?"))
-                                     #  #textOutput('glm_summary')
-                                     #)
                             ),
-                                
-                            
-                             
-                            
-                            
                             tabPanel("Prediction",
-                                     h3("GLM predict"),
+                                     h3("Predict water potability with logistic regression model"),
                                      br(),
                                      uiOutput("glm_predictors"),
-                                     h3('RF predict'),
+                                     h3('Predict water potability with random forest model'),
                                      uiOutput("rf_predictors"),
                                      actionButton('predict', 'Predict', class = "btn-primary btn-lg"),
                                      br(),
@@ -284,37 +222,5 @@ shinyUI(
                                      textOutput('pred_rf')
                                      ),
                            )
-                        
-                        
                         ))
-    
-    
-    #fluidPage(
-    # titlePanel("Summaries for German Credit Data"),
-    # 
-    # sidebarLayout(
-    #     sidebarPanel(
-    #         h4("This data set comes from the", 
-    #            HTML("<a href='https://topepo.github.io/caret'>caret package</a>  - originally from the UCI machine learning repository")),
-    #         br(),
-    #         h6("You can create a few bar plots using the radio buttons below."),
-    #         radioButtons("radio_choice", "Select the Plot Type",
-    #                      choices = c("Just Classification", 
-    #                                  "Classification and Unemployed", 
-    #                                  "Classification and Foreign"),
-    #                      selected = "Just Classification"),
-    #         br(),
-    #         h5("You can find the ", HTML("<b>sample mean</b>"),  " for a few variables below: "),
-    #         selectInput("variables_to_summarize", "Variables to Summarize",
-    #                     choices = c("Age", "Duration", "Amount"),
-    #                     selected = "Age"),
-    #         numericInput("numeric_value", "Select the number of digits for rounding", value = 2, min = 0, step = 1)
-    #         
-    #     ),
-    #     mainPanel(
-    #         plotOutput("summary_plot"),
-    #         DTOutput("summary_table")
-    #     ) )
-#)
-
 )
