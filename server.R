@@ -367,6 +367,7 @@ shinyServer(function(input, output) {
                                                  if_water_potable(res_glm) )})
             output$pred_rf <- renderText({paste('Prediction from Random Forest model:', 
                                                 if_water_potable (res_rf))})
+            br()
     })
 })
     

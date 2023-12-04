@@ -7,6 +7,7 @@ output: pdf_document
 
 ```{r}
 library(tidyverse)
+library(caret)
 ```
 
 
@@ -23,8 +24,180 @@ sapply(data, function(x) sum(is.na(x)))
 data = na.omit(data)
 nrow(data)
 #drop_na(data)
+
+
+trainIndex <- createDataPartition(data$Potability, p = 0.8, 
+                                      list = FALSE, 
+                                      times = 1)
+train_data = data[trainIndex, ]
+val_data = data[-trainIndex, ]
 ```
 
+```{r}
+
+
+#rf_predictors = input$rf_predictor_selector
+
+rf_predictors = c("ph", "Solids", "Hardness")
+
+train_data$Potability = as.factor(train_data$Potability)
+
+train_control <- trainControl(
+            method = "cv",
+            #number = as.numeric(input$folds_rf),
+            number = 3,
+            search = "grid"
+        )
+rf_model = train(reformulate(rf_predictors, "Potability"),
+                 data = train_data,
+                 method = "rf",
+                 #tuneGrid = data.frame(mtry = c(1:5)),
+                 tuneGrid = expand.grid(mtry=c(1:5)),
+                 #tuneGrid = expand.grid(mtry=c(as.numeric(input$minMtry):as.numeric(input$maxMtry)) ),
+                 #tuneGrid = data.frame(mtry = c(input$minMtry:input$maxMtry)),
+                 metric="Accuracy",
+                 trControl = train_control,
+                 importance = TRUE
+                 )
+
+
+```
+
+
+```{r}
+#str(data)
+t = varImp(rf_model, scale = FALSE)
+
+#t2 = importance(rf_model)
+
+#typeof(t2)
+```
+
+
+```{r}
+t[[1]]
+
+```
+
+
+```{r}
+
+vars = c("ph", "Hardness", "Solids")
+
+#lm(reformulate(vars, "Potability"), data=train_data)
+
+
+
+train.control = trainControl(method = "cv", 
+                              number = 5, 
+                              #summaryFunction=mnLogLoss,
+                              classProbs = FALSE)
+
+set.seed(83)
+
+train_data$Potability = as.factor(train_data$Potability)
+lr_model_1 = train(reformulate(vars, "Potability"), 
+                                 data = train_data,
+                                 method = "glm", 
+                                 family="binomial"
+                                 #metric="logLoss",
+                                 #trControl = train.control
+                                )
+summary(lr_model_1)
+
+
+lr_model_1$results$Accuracy
+```
+
+```{r}
+glm_predictors = c("ph", "Hardness", "Solids")
+glm_model = train(reformulate(glm_predictors, "Potability"), 
+                               data = train_data,
+                               method = "glm", 
+                               family="binomial")
+```
+
+```{r}
+train_control <- trainControl(
+  method = "cv",   
+  number = 5
+)
+
+rf_model = train(
+  Diabetes_binary_transformed ~ HighChol+
+                                BMI + 
+                                GenHlth+
+                                HeartDiseaseorAttack+
+                                Age+
+                                Income,
+  data = select(train_data, -Diabetes_binary),
+  method = "rf",
+  tuneGrid = data.frame(mtry = c(1:4)), 
+  trControl = train_control
+)
+```
+
+
+```{r}
+vars = c("ph", "Hardness", "Solids")
+rf_model = train(
+                reformulate(vars, "Potability"),
+                data = train_data,
+                method = "rf",
+                #tuneGrid = data.frame(mtry = c(1:4)),
+                #trControl = train_control
+            )
+```
+
+
+```{r}
+
+
+rf_model$results$Accuracy
+rf_model$bestTune$mtry
+max(rf_model$results$Accuracy)
+```
+
+```{r}
+
+split_data <- function(partition, data) {
+    
+    results <- list()
+    trainIndex <- createDataPartition(data$Potability, p = partition, 
+                                      list = FALSE, 
+                                      times = 1)
+    train_data = data[trainIndex, ]
+    val_data = data[-trainIndex, ]
+    
+    results = append(results, train_data)
+    results = append(results, val_data)
+    
+    return (results)
+}
+
+```
+
+```{r}
+trainIndex <- createDataPartition(data$Potability, p = 0.8, 
+                                      list = FALSE, 
+                                      times = 1)
+train_data = data[trainIndex, ]
+val_data = data[-trainIndex, ]
+
+```
+
+
+```{r}
+#t = split_data(0.8, data)
+
+train_data
+```
+
+
+```{r}
+typeof(t[[1]])
+
+```
 
 ```{r}
 data %>%

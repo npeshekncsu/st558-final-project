@@ -30,15 +30,20 @@ shinyUI(
                             column(8, offset = 0.5, align = "left",  # Adjust the column width and alignment as needed
                                    # Additional content on the right (e.g., image and text)
                                    img(src = "final_project_logo.jpg", width = "20%"),
-                                   h2("ST 558 Final Project Application"),
+                                   #h2("About this project"),
+                                  
                                    
-                                   p('This part of the homepage contains data in text format. This text data is totally random.'), 
-                                   
-                                   h3("The purpose of the app"),
-                                   br(),
-                                   
+                                   h3("Purpose of the application"),
+                                   p('This application allows to predict water potability based on water quality metrics'),
                                    h3("Data"),
-                                   br()
+                                   p("Dataset was taken from ",  a(href="https://www.kaggle.com/datasets/devanshibavaria/water-potability-dataset-with-10-parameteres",
+                                                                "Kaggle"), '.'),
+                                   br(),
+                                   h4("Features in dataset"),
+                                   h5('pH value'),
+                                   p('PH is an important parameter in evaluating the acid–base balance of water. It is also the indicator of acidic or alkaline condition of water status. WHO has recommended maximum permissible limit of pH from 6.5 to 8.5. The current investigation ranges were 6.52–6.83 which are in the range of WHO standards.'),
+                                   h5('Hardness'),
+                                   p('Hardness is mainly caused by calcium and magnesium salts. These salts are dissolved from geologic deposits through which water travels. The length of time water is in contact with hardness producing material helps determine how much hardness there is in raw water. Hardness was originally defined as the capacity of water to precipitate soap caused by Calcium and Magnesium.'),
                                    
                             ),
                             #box(title='SimpleApp left box', width= 6,
@@ -125,7 +130,27 @@ shinyUI(
                tabPanel('Modeling', 
                         tabsetPanel(
                             tabPanel("Model Info",
-                                     h3('Text')), 
+                                     h3('Logistic Regression model'),
+                                     br(),
+                                     p(withMathJax ('Logistic regression is used for binary classification problems where the outcome variable is categorical and has two classes. Logistic regression models the probability that a given instance belongs to a particular category. It uses the logistic function (sigmoid function) to map predicted values to probabilities between 0 and 1.  The logistic regression model is represented as: $$P(Y=1) = \\frac{1}{1+e^{-(\\beta_0 + \\beta_1 X_{1} + \\beta_2 X_2 + ... + \\beta_n X_n)}}$$  The model is trained using the maximum likelihood estimation method, minimizing the logistic loss function.')),
+                                     h4('Advantages of logistic regression model'),
+                                     p('Logistic regression is simple and interpretable. It works well when  the relationship between features and target is approximately linear.'),
+                                     h4('Weaknesses of logistic regression model'),
+                                     p('Logistic regression assumes a linear relationship between the features and the log-odds of the response variable. Logistic regression assumes that errors are independent of each other. ogistic regression does not provide direct measures of feature importance.'),
+                                     br(),
+                                     h3('Random Forest model'),
+                                     br(),
+                                     p('Random Forest is a versatile algorithm that can be used for both classification and regression tasks.'),
+                                     p('Random Forest builds multiple decision trees during training and merges them together to get a more accurate and stable prediction. Each tree is trained on a random subset of the data and a random subset of features, which introduces diversity and reduces overfitting.'),
+                                     p('A Random Forest is an ensemble of decision trees. The final prediction is made by averaging (for regression) or voting (for classification) the predictions of individual trees.'),
+                                     p('Each tree in the forest is trained independently on a random subset of the training data, using a random subset of features at each split. The randomness helps in reducing overfitting and improving generalization.'),
+                                     h4('Advantages of random forest model'),
+                                     p('Random Forest model handles non-linearity and complex relationships well. It is robust to outliers and noise. Random Forest provides feature importance information.'),
+                                     h4('Weaknesses of random forest model'),
+                                     p('Random Forests can be computationally expensive, especially with a large number of trees and deep trees. Random Forest models can be challenging to interpret, especially when dealing with a large number of trees.')
+                                   
+                                     
+                                     ), 
                             tabPanel("Model Fitting",
                                      br(),
                                      h2("Train/validation data split"),
