@@ -2,7 +2,7 @@
 
 # Goal
 
-The purpose of the repo is to develop Shiny application which allows users to train logistic regression and random forest models for predicting water potability based on water quality metrics. Once the models are built, they could be used to predict water potability on new data. The application also enables users to conduct exploratory data analysis on the water potability dataset.
+The purpose of the repo is to develop Shiny application which allows users to train logistic regression and random forest models for predicting water potability based on water quality metrics from [Kaggle dataset](https://www.kaggle.com/datasets/devanshibavaria/water-potability-dataset-with-10-parameteres). Once the models are built, they could be used to predict water potability on new data. The application also enables users to conduct exploratory data analysis on the water potability dataset.
 
 # Used packages and installation code
 
