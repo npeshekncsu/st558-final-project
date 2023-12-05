@@ -14,6 +14,8 @@ The purpose of the repo is to develop Shiny application which allows users to tr
   - `corrplot` - required for correlation matrix visualizing
   - `Metrics` - required for evaluation metrics calculation
 
+
+Run the following code to install all required packages.
 ```
 install.packages(c("shiny", "tidyverse", "caret", "DT", "ggplot2", "corrplot", "Metrics"))
 ```
