@@ -4,7 +4,6 @@ library(tidyverse)
 library(DT)
 library(ggplot2)
 library(corrplot)
-library(caret)
 library(Metrics)
 
 
@@ -30,6 +29,15 @@ data <- data %>%
 
 
 data <- data %>%
+    mutate(Hardness_quartiles = case_when(
+        Hardness <= quantile(data$Hardness)[[1]] ~ "Q1",
+        Hardness > quantile(data$Hardness)[[1]] & Hardness <= quantile(data$Hardness)[[2]] ~ "Q2",
+        Hardness > quantile(data$Hardness)[[2]] & Hardness <= quantile(data$Hardness)[[3]] ~ "Q3",
+        Hardness > quantile(data$Hardness)[[3]] ~ "Q4"
+    )) %>% mutate(Hardness_quartiles = as.factor(Hardness_quartiles))
+
+
+data <- data %>%
     mutate(Solids_quartiles = case_when(
         Solids <= quantile(data$Solids)[[1]] ~ "Q1",
         Solids > quantile(data$Solids)[[1]] & Solids <= quantile(data$Solids)[[2]] ~ "Q2",
@@ -37,6 +45,14 @@ data <- data %>%
         Solids > quantile(data$Solids)[[3]] ~ "Q4"
     )) %>% mutate(Solids_quartiles = as.factor(Solids_quartiles))
 
+
+data <- data %>%
+    mutate(Organic_carbon_quartiles = case_when(
+        Organic_carbon <= quantile(data$Organic_carbon)[[1]] ~ "Q1",
+        Organic_carbon > quantile(data$Organic_carbon)[[1]] & Organic_carbon <= quantile(data$Organic_carbon)[[2]] ~ "Q2",
+        Organic_carbon > quantile(data$Organic_carbon)[[2]] & Organic_carbon <= quantile(data$Organic_carbon)[[3]] ~ "Q3",
+        Organic_carbon > quantile(data$Organic_carbon)[[3]] ~ "Q4"
+    )) %>% mutate(Organic_carbon_quartiles = as.factor(Organic_carbon_quartiles))
 
 if_water_potable <- function(binary_value) {
     if (binary_value == 0) {
@@ -46,9 +62,6 @@ if_water_potable <- function(binary_value) {
         return ('Potable water')
     }
 }
-
-#current_glm_model = NULL
-#current_rf_model = NULL
 
 
 shinyServer(function(input, output) {
@@ -61,30 +74,20 @@ shinyServer(function(input, output) {
                                      values = c("0" = "grey", "1" = "red"),
                                      labels = c("0" = "Not potable", "1" = "Potable")
                                  ) +
-                                 labs(fill = "Water Potability") + theme_bw()
+                                 labs(fill = "Water Potability",
+                                      title = "Density plot",
+                                      x = '', 
+                                      y = '',) + 
+                theme_bw()
             
         }
         else if(input$graph_type == 'Violin') {
-            # ggplot(data, aes(x = as.factor(Potability), 
-            #                  y = get(input$variables_to_summarize), 
-            #                  group = Potability, 
-            #                  fill = as.factor(Potability)) ) +
-            #     labs(#title = "Violin plot of sulfate by potability status",
-            #          x = "potability",
-            #          y = "Sulfate") + 
-            #     geom_violin(trim = FALSE, alpha=.5) + scale_fill_manual(
-            #         values = c("0" = "grey", "1" = "red"),
-            #         labels = c("0" = "Not potable", "1" = "Potable")) +
-            #     labs(fill = "Water Potability") + theme_bw()
-            
-            
-            
+
             ggplot(data, aes(x = as.factor(Potability), 
                              y = get(input$variables_to_summarize), 
                              group = Potability, 
                              fill = as.factor(Potability)) ) +
                 labs(
-                    # title = "Violin plot of sulfate by potability status",
                     title = "Violin plot",
                     x = '', 
                     y = '',
@@ -95,7 +98,6 @@ shinyServer(function(input, output) {
                     values = c("0" = "grey", "1" = "red"),
                     labels = c("0" = "Not potable", "1" = "Potable")
                 ) +
-                #labs(fill = "Water Potability") + 
                 theme_bw()
             
             
@@ -107,25 +109,24 @@ shinyServer(function(input, output) {
                 geom_boxplot(alpha=.5) + scale_fill_manual(
                     values = c("0" = "grey", "1" = "red"),
                     labels = c("0" = "Not potable", "1" = "Potable")) +
-                labs(fill = "Water Potability") + theme_bw()
+                labs(fill = "Water Potability", 
+                     title = "Boxplot",
+                     x = '', 
+                     y = '',) + theme_bw()
         }
     })
     
     output$scatter_plot <- renderPlot ({
-        #ggplot(data, aes(x=get(input$x_var), y=get(input$y_var), color=as.factor(Potability))) + 
-        #    geom_point() + scale_fill_manual(
-        #        values = c("0" = "grey", "1" = "red"),
-        #        labels = c("0" = "Not potable", "1" = "Potable")) +
-        #    labs(fill = "Water Potability")
-        
-        
+       
         ggplot(data, aes(x=get(input$x_var), y=get(input$y_var), color=as.factor(Potability))) + 
             geom_point() + scale_color_manual(
                 values = c("0" = "grey", "1" = "red"),
                 labels = c("0" = "Not potable", "1" = "Potable"),
                 name = "Water Potability") +
-            theme_bw()
-            #labs(fill = "Water Potability")
+            theme_bw() + 
+            labs(fill = "Water Potability", 
+                 x = '', 
+                 y = '')
     })
     
     output$quantile_plot <- renderPlot({
@@ -172,31 +173,82 @@ shinyServer(function(input, output) {
                 ) +
                 labs(fill = "Water Potability") + theme_bw()
         }
+        else if (input$histogram_var == 'Hardness') {
+            ggplot(data, aes(x = Hardness_quartiles, fill = as.factor(Potability), group = Potability)) +
+                geom_bar(position = "stack", alpha=.5) +
+                labs(
+                    title = "Number of cases of potable and not potable water for each hardness quantile",
+                    x = "Hardness quantiles",
+                    y = "Number of Cases"
+                ) +
+                scale_fill_manual(
+                    values = c("0" = "grey", "1" = "red"),
+                    labels = c("0" = "Not potable", "1" = "Potable")
+                ) +
+                labs(fill = "Water Potability") + theme_bw()
+        } 
+        else if(input$histogram_var == 'Organic_carbon') {
+            ggplot(data, aes(x = Organic_carbon_quartiles, fill = as.factor(Potability), group = Potability)) +
+                geom_bar(position = "stack", alpha=.5) +
+                labs(
+                    title = "Number of cases of potable and not potable water for each organic carbon quantile",
+                    x = "Hardness quantiles",
+                    y = "Number of Cases"
+                ) +
+                scale_fill_manual(
+                    values = c("0" = "grey", "1" = "red"),
+                    labels = c("0" = "Not potable", "1" = "Potable")
+                ) +
+                labs(fill = "Water Potability") + theme_bw()
+        }
         
         
     })
     
     output$corr_plot <- renderPlot({
-        
         if (input$corr_plot_type == 'Color') {
-            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, -Chloramines_quartiles))), 
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, 
+                                                   -Chloramines_quartiles, -Hardness_quartiles,
+                                                   -Organic_carbon_quartiles))), 
                      type="upper", 
                      method = 'color', order = 'alphabet',
                      tl.pos = "lt")
         }
         else if (input$corr_plot_type == 'Number') {
-            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, -Chloramines_quartiles))), 
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, 
+                                                   -Chloramines_quartiles, -Hardness_quartiles,
+                                                   -Organic_carbon_quartiles))), 
                      type="upper", 
                      method = 'number',
                      tl.pos = "lt")
         }
         else if (input$corr_plot_type == 'Elipse') {
-            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, -Chloramines_quartiles))), 
+            corrplot(cor(as.matrix(data %>% select(-Sulfate_quartiles, -Solids_quartiles, 
+                                                   -Chloramines_quartiles, -Hardness_quartiles,
+                                                   -Organic_carbon_quartiles))), 
                      method = 'ellipse', 
                      order = 'AOE', 
                      type = 'upper',
                      tl.pos = "lt")
         }
+    })
+    
+    output$counts_for_levels <- renderPlot({
+        ggplot(data, aes(x = as.factor(Potability), fill = as.factor(Potability))) +
+            geom_bar(stat = "count", alpha = 0.5) +
+            geom_text(stat = "count", aes(label = after_stat(count), vjust = -0.5)) +
+            scale_fill_manual(
+                values = c("0" = "grey", "1" = "red"),
+                name = "Potability",
+                breaks = c("0", "1"),
+                labels = c("Non Potable", "Potable")
+            ) +
+            labs(
+                title = "Counts for potability levels",
+                x = "Potability",
+                y = "Count"
+            ) +
+            theme_bw()
     })
         
     observeEvent(input$train, {

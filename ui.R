@@ -1,6 +1,5 @@
 library(shiny)
 library(caret)
-library(shiny)
 library(DT)
 
 
@@ -12,10 +11,10 @@ shinyUI(
     navbarPage(title='Final Project App',
                tabPanel('About',
                         fluidRow(
-                            column(8, offset = 0.5, align = "left",
+                            column(10, offset = 0.5, align = "left",
                                    img(src = "final_project_logo.jpg", width = "20%"),
                                    h3("Purpose of the application"),
-                                   p('This application allows for the prediction of water potability based on water quality metrics.'),
+                                   p('This application allows users to train logistic regression and random forest models for predicting water potability based on water quality metrics. Once the models are built, they can be used to predict water potability on new data. The application also enables users to conduct exploratory data analysis on the water potability dataset.'),
                                    h3("Data"),
                                    p("The dataset used to train models is taken from ",  a(href="https://www.kaggle.com/datasets/devanshibavaria/water-potability-dataset-with-10-parameteres",
                                                                 "Kaggle"), '.'),
@@ -115,9 +114,10 @@ shinyUI(
                                 h4("Histograms", align = 'center'),
                                 selectInput("histogram_var", "Select variable",
                                             choices = c("Solids", 
-                                                        "Sulfate", "Chloramines"),
+                                                        "Sulfate", "Chloramines", "Hardness", "Organic_carbon"),
                                             selected = "Solids"),
-                                plotOutput("quantile_plot")
+                                plotOutput("quantile_plot"),
+                                plotOutput("counts_for_levels")
                             )
                             )
                         ),
